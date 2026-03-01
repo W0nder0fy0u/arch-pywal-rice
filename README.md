@@ -9,6 +9,24 @@
 
 ---
 
+## 📸 Preview
+
+> Here's what your desktop will look like after ricing
+
+### Default Look
+![Preview](theme/prebiew.png)
+
+### Second Wallpaper Theme
+![Preview 2](theme/preview%202.png)
+
+### Theme Switching in Action
+![Theme Change](theme/change.png)
+
+### Full Desktop Overview
+![Full Theme](theme/theme.png)
+
+---
+
 ## ✨ What This Does
 
 ```bash
@@ -130,6 +148,12 @@ arch-pywal-rice/
 ├── README.md
 ├── install.sh                              ← Run this first
 ├── .xinitrc                                ← Restores theme on X startup
+│
+├── theme/                                  ← Preview screenshots
+│   ├── change.png
+│   ├── prebiew.png
+│   ├── preview 2.png
+│   └── theme.png
 │
 ├── .config/
 │   ├── i3/
