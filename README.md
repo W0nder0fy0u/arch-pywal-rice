@@ -25,7 +25,7 @@
 ![Full Theme](theme/theme.png)
 
 ### ROFI 
-![rofi](theme/rofi.jpeg)
+![rofi](theme/rofi2.jpeg)
 
 ---
 
