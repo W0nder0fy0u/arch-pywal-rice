@@ -1,0 +1,55 @@
+#!/bin/bash
+# ╔═══════════════════════════════════════════════╗
+# ║        Pywal Master Theme Switch              ║
+# ║  Usage: theme /path/to/wallpaper.jpg          ║
+# ║  Works with: jpg, png, gif                    ║
+# ╚═══════════════════════════════════════════════╝
+
+WAL="$1"
+
+# ── Validate input ───────────────────────────────
+if [ -z "$WAL" ]; then
+    echo "Usage: theme /path/to/wallpaper"
+    echo "Example: theme ~/Pictures/forest.jpg"
+    exit 1
+fi
+
+if [ ! -f "$WAL" ]; then
+    echo "Error: File not found — $WAL"
+    exit 1
+fi
+
+echo "🎨 Applying theme from: $(basename "$WAL")"
+
+# ── 1. Generate all colors from wallpaper ────────
+wal -i "$WAL"
+echo "✓ Colors extracted"
+
+# ── 2. Apply Xresources (legacy terminal support) 
+xrdb -merge ~/.cache/wal/colors.Xresources
+echo "✓ Xresources updated"
+
+# ── 3. Reload i3 (applies new border + bar colors)
+i3-msg reload > /dev/null 2>&1
+echo "✓ i3 reloaded"
+
+# ── 4. Update terminator config ──────────────────
+if [ -f ~/.cache/wal/colors-terminator ]; then
+    cp ~/.cache/wal/colors-terminator ~/.config/terminator/config
+    echo "✓ Terminator themed"
+fi
+
+# ── 5. Reload kitty if running ───────────────────
+if pgrep kitty > /dev/null; then
+    kill -SIGUSR1 $(pgrep kitty)
+    echo "✓ Kitty reloaded"
+fi
+
+# ── 6. Start picom if not running ────────────────
+if ! pgrep picom > /dev/null; then
+    picom --daemon &
+    echo "✓ Picom started"
+fi
+
+echo ""
+echo "✅ Done! Theme: $(basename "$WAL")"

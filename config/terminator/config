@@ -1,0 +1,23 @@
+# Terminator base config
+# This gets overwritten each time you run: theme /path/to/wallpaper
+# Requires picom running for transparency to work
+
+[global_config]
+[keybindings]
+[profiles]
+  [[default]]
+    background_type     = transparent
+    background_darkness = 0.2
+    use_system_font     = False
+    font                = FiraCode Nerd Font 11
+    show_titlebar       = False
+    scrollbar_position  = hidden
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type   = Window
+      parent = ""
+    [[[child1]]]
+      type   = Terminal
+      parent = window0
+[plugins]

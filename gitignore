@@ -1,0 +1,10 @@
+# Personal wallpapers - add your own
+Pictures/
+wallpapers/
+
+# pywal cache - generated automatically
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,4 @@
+/* Rofi config — points to pywal generated theme
+   The install.sh script replaces HOME_PATH with your actual home directory */
+
+@theme "HOME_PATH/.cache/wal/colors-rofi-dark.rasi"
