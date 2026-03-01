@@ -24,6 +24,9 @@
 ### Full Desktop Overview
 ![Full Theme](theme/theme.png)
 
+### ROFI 
+![Preview 2](theme/rofi%202.jpeg)
+
 ---
 
 ## ✨ What This Does
