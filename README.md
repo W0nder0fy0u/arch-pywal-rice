@@ -13,10 +13,9 @@
 
 > Here's what your desktop will look like after ricing
 
-### Default Look
-![Preview](theme/prebiew.png)
 
-### Second Wallpaper Theme
+
+### Wallpaper Theme
 ![Preview 2](theme/preview%202.png)
 
 ### Theme Switching in Action
