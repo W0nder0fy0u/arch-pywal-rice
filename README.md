@@ -1,4 +1,4 @@
-# 🎨 Arch Linux Pywal Rice
+ii# 🎨 Arch Linux Pywal Rice
 
 > **One command. Entire desktop recolors from your wallpaper.**
 
@@ -286,8 +286,6 @@ fc-cache -fv
 - [i3wm](https://i3wm.org/) — window manager
 - [rofi](https://github.com/davatorium/rofi) — application launcher
 - [picom](https://github.com/yshui/picom) — compositor for transparency
-- Inspired by [3rfaan/dotfiles](https://github.com/3rfaan/dotfiles_old)
-
 ---
 
 ## 📄 License
