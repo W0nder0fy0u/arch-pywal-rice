@@ -1,4 +1,4 @@
-ii# 🎨 Arch Linux Pywal Rice
+# 🎨 Arch Linux Pywal Rice
 
 > **One command. Entire desktop recolors from your wallpaper.**
 
