@@ -15,6 +15,9 @@
 ### Wallpaper Theme
 ![Preview 2](theme/preview%202.png)
 
+### THEME
+![theme](theme/hihicool.png)
+
 ### Theme Switching in Action
 ![Theme Change](theme/change.png)
 
@@ -23,6 +26,7 @@
 
 ### ROFI Launcher
 ![rofi](theme/rofi2.jpeg)
+
 
 ---
 
@@ -109,6 +113,9 @@ An interactive terminal panel to control everything:
 
 Pick a number → enter new value → press `y` to apply instantly.
 
+### RICECTL
+![ricectl](theme/ricec.png)
+
 ---
 
 ## 📦 Requirements
@@ -189,6 +196,9 @@ theme ~/Pictures/your-wallpaper.jpg
 Then reload i3 with `Mod+Shift+R`.
 
 ---
+
+### YES YOU CAN HAVE THIS COOL DESKTOP
+![theme](theme/prof.png)
 
 ## 🔄 Daily Usage
 
