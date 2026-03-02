@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "Usage: ldm /path/to/wallpaper"
+    exit 1
+fi
+
+WAL=$(realpath "$1")
+FILENAME=$(basename "$WAL")
+PUBLIC="/usr/share/lightdm/wallpapers/$FILENAME"
+
+sudo cp "$WAL" "$PUBLIC"
+sudo chmod 644 "$PUBLIC"
+
+sudo chattr -i /etc/lightdm/lightdm-gtk-greeter.conf
+sudo sed -i "s|^background =.*|background = $PUBLIC|" /etc/lightdm/lightdm-gtk-greeter.conf
+sudo chattr +i /etc/lightdm/lightdm-gtk-greeter.conf
+
+echo "✓ LightDM login screen changed to: $FILENAME"

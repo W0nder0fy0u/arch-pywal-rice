@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Usage: theme-switch ~/Pictures/wallpaper.jpg
+
+WAL=$1
+
+# Apply pywal - generates all color files in ~/.cache/wal/
+wal -i "$WAL"
+
+# Reload i3 colors
+i3-msg reload
+
+# Restart polybar if running
+if pgrep polybar > /dev/null; then
+    pkill polybar
+    sleep 0.5
+    polybar &
+fi
+
+# Reload alacritty (auto-reloads on config change, nothing needed)
+
+# Reload kitty
+if pgrep kitty > /dev/null; then
+    kill -SIGUSR1 $(pgrep kitty)
+fi
+
+echo "Theme applied from: $WAL"

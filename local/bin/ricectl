@@ -1,0 +1,198 @@
+#!/bin/bash
+
+PICOM_CONF="$HOME/.config/picom/picom.conf"
+TERMINATOR_CONF="$HOME/.config/terminator/config"
+I3_CONF="$HOME/.config/i3/config"
+
+get_opacity() {
+    grep "'$1'" "$PICOM_CONF" | grep -o '^"[0-9]*' | tr -d '"'
+}
+
+add_app() {
+    echo ""
+    echo "Open the app, then in another terminal run:"
+    echo "  xprop | grep WM_CLASS"
+    echo "and click on the app window."
+    echo ""
+    read -p "Enter app class name: " APPNAME
+    read -p "Enter opacity (0-100): " APPOPACITY
+    if grep -q "'$APPNAME'" "$PICOM_CONF"; then
+        sed -i "s/\"[0-9]*:class_g = '$APPNAME'\"/\"$APPOPACITY:class_g = '$APPNAME'\"/" "$PICOM_CONF"
+        echo "✓ Updated $APPNAME to opacity $APPOPACITY"
+    else
+        sed -i "/^\];/i\\  \"$APPOPACITY:class_g = '$APPNAME'\"," "$PICOM_CONF"
+        echo "✓ Added $APPNAME with opacity $APPOPACITY"
+    fi
+}
+
+apply_changes() {
+    echo "Applying all changes..."
+    pkill picom
+    sleep 0.5
+    picom --config "$PICOM_CONF" --daemon &
+    i3-msg reload > /dev/null
+    echo "✓ All changes applied!"
+}
+
+show_menu() {
+    WALLPAPER=$(cat ~/.fehbg 2>/dev/null | grep -o "'.*'" | tr -d "'")
+    GAMMA=$(grep xrandr "$I3_CONF" 2>/dev/null | grep -o 'gamma [0-9.:]*' | awk '{print $2}')
+    BRIGHTNESS=$(grep xrandr "$I3_CONF" 2>/dev/null | grep -o 'brightness [0-9.]*' | awk '{print $2}')
+    TERM_DARK=$(grep background_darkness "$TERMINATOR_CONF" 2>/dev/null | grep -o '[0-9.]*')
+
+    clear
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║            RICECTL - Rice Control Panel                  ║"
+    echo "╠══════════════════════════════════════════════════════════╣"
+    echo "║  DISPLAY                                                 ║"
+    echo "║  [1]  Brightness     : ${BRIGHTNESS:-1.0}                             ║"
+    echo "║  [2]  Gamma Contrast : ${GAMMA:-0.8:0.8:0.8}                     ║"
+    echo "║                                                          ║"
+    echo "║  WALLPAPER                                               ║"
+    echo "║  [3]  Wallpaper      : $(basename ${WALLPAPER:-none})              ║"
+    echo "║                                                          ║"
+    echo "║  TERMINAL                                                ║"
+    echo "║  [4]  Terminator     : ${TERM_DARK:-0.2} (lower=more transparent)  ║"
+    echo "║                                                          ║"
+    echo "║  APP OPACITY (100=opaque, 70=30% transparent)            ║"
+    echo "║  [5]  firefox        : $(get_opacity firefox)                             ║"
+    echo "║  [6]  Brave          : $(get_opacity Brave-browser)                             ║"
+    echo "║  [7]  Google-chrome  : $(get_opacity Google-chrome)                             ║"
+    echo "║  [8]  code-oss       : $(get_opacity code-oss)                             ║"
+    echo "║  [9]  Thunar         : $(get_opacity Thunar)                             ║"
+    echo "║  [10] Dolphin        : $(get_opacity dolphin)                             ║"
+    echo "║  [11] Spotify        : $(get_opacity Spotify)                             ║"
+    echo "║  [12] Telegram       : $(get_opacity TelegramDesktop)                             ║"
+    echo "║  [13] Zoom           : $(get_opacity Zoom)                             ║"
+    echo "║  [14] qBittorrent    : $(get_opacity qBittorrent)                             ║"
+    echo "║  [15] Zathura        : $(get_opacity Zathura)                             ║"
+    echo "║  [16] Rofi           : $(get_opacity Rofi)                             ║"
+    echo "║  [17] pavucontrol    : $(get_opacity pavucontrol)                             ║"
+    echo "║  [18] VirtualBox     : $(get_opacity 'VirtualBox Manager')                             ║"
+    echo "║  [19] Alacritty      : $(get_opacity Alacritty)                             ║"
+    echo "║  [20] kitty          : $(get_opacity kitty)                             ║"
+    echo "║  [21] Terminator     : $(get_opacity terminator)                             ║"
+    echo "║  [22] mpv            : $(get_opacity mpv)                             ║"
+    echo "║  [23] vlc            : $(get_opacity vlc)                             ║"
+    echo "║  [24] Lutris         : $(get_opacity Lutris)                             ║"
+    echo "║  [25] Shotwell       : $(get_opacity Shotwell)                             ║"
+    echo "║  [26] darktable      : $(get_opacity darktable)                             ║"
+    echo "║  [27] Blueman        : $(get_opacity Blueman-manager)                             ║"
+    echo "║  [28] nvidia-settings: $(get_opacity Nvidia-settings)                             ║"
+    echo "║  [29] flameshot      : $(get_opacity flameshot)                             ║"
+    echo "║  [30] wpgtk          : $(get_opacity Wpgtk)                             ║"
+    echo "║                                                          ║"
+    echo "║  [n] Add new app                                         ║"
+    echo "║  [a] Apply ALL changes                                   ║"
+    echo "║  [r] Reset all opacity to default                        ║"
+    echo "║  [q] Quit                                                ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
+    echo ""
+}
+
+while true; do
+    show_menu
+    read -p "Select option: " OPT
+
+    case $OPT in
+      1)
+        read -p "Brightness (0.5-1.5, current: ${BRIGHTNESS:-1.0}): " VAL
+        sed -i "s/--brightness [0-9.]*/--brightness $VAL/" "$I3_CONF"
+        xrandr --output eDP1 --brightness $VAL
+        echo "✓ Brightness set to $VAL"
+        ;;
+      2)
+        read -p "Gamma (format 0.8:0.8:0.8): " VAL
+        sed -i "s/--gamma [0-9.:]*/--gamma $VAL/" "$I3_CONF"
+        xrandr --output eDP1 --gamma $VAL
+        echo "✓ Gamma set to $VAL"
+        ;;
+      3)
+        read -p "Full wallpaper path: " VAL
+        theme "$VAL"
+        echo "✓ Wallpaper changed"
+        ;;
+      4)
+        read -p "Terminator darkness (0.0-1.0): " VAL
+        sed -i "s/background_darkness = .*/background_darkness = $VAL/" "$TERMINATOR_CONF"
+        echo "✓ Terminator transparency set to $VAL"
+        ;;
+      5)  read -p "firefox opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'firefox'\"/\"$VAL:class_g = 'firefox'\"/" "$PICOM_CONF" ;;
+      6)  read -p "Brave opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Brave-browser'\"/\"$VAL:class_g = 'Brave-browser'\"/" "$PICOM_CONF" ;;
+      7)  read -p "Google-chrome opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Google-chrome'\"/\"$VAL:class_g = 'Google-chrome'\"/" "$PICOM_CONF" ;;
+      8)  read -p "code-oss opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'code-oss'\"/\"$VAL:class_g = 'code-oss'\"/" "$PICOM_CONF" ;;
+      9)  read -p "Thunar opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Thunar'\"/\"$VAL:class_g = 'Thunar'\"/" "$PICOM_CONF" ;;
+      10) read -p "Dolphin opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'dolphin'\"/\"$VAL:class_g = 'dolphin'\"/" "$PICOM_CONF" ;;
+      11) read -p "Spotify opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Spotify'\"/\"$VAL:class_g = 'Spotify'\"/" "$PICOM_CONF" ;;
+      12) read -p "Telegram opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'TelegramDesktop'\"/\"$VAL:class_g = 'TelegramDesktop'\"/" "$PICOM_CONF" ;;
+      13) read -p "Zoom opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Zoom'\"/\"$VAL:class_g = 'Zoom'\"/" "$PICOM_CONF" ;;
+      14) read -p "qBittorrent opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'qBittorrent'\"/\"$VAL:class_g = 'qBittorrent'\"/" "$PICOM_CONF" ;;
+      15) read -p "Zathura opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Zathura'\"/\"$VAL:class_g = 'Zathura'\"/" "$PICOM_CONF" ;;
+      16) read -p "Rofi opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Rofi'\"/\"$VAL:class_g = 'Rofi'\"/" "$PICOM_CONF" ;;
+      17) read -p "pavucontrol opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'pavucontrol'\"/\"$VAL:class_g = 'pavucontrol'\"/" "$PICOM_CONF" ;;
+      18) read -p "VirtualBox opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'VirtualBox Manager'\"/\"$VAL:class_g = 'VirtualBox Manager'\"/" "$PICOM_CONF" ;;
+      19) read -p "Alacritty opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Alacritty'\"/\"$VAL:class_g = 'Alacritty'\"/" "$PICOM_CONF" ;;
+      20) read -p "kitty opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'kitty'\"/\"$VAL:class_g = 'kitty'\"/" "$PICOM_CONF" ;;
+      21) read -p "Terminator opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'terminator'\"/\"$VAL:class_g = 'terminator'\"/" "$PICOM_CONF" ;;
+      22) read -p "mpv opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'mpv'\"/\"$VAL:class_g = 'mpv'\"/" "$PICOM_CONF" ;;
+      23) read -p "vlc opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'vlc'\"/\"$VAL:class_g = 'vlc'\"/" "$PICOM_CONF" ;;
+      24) read -p "Lutris opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Lutris'\"/\"$VAL:class_g = 'Lutris'\"/" "$PICOM_CONF" ;;
+      25) read -p "Shotwell opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Shotwell'\"/\"$VAL:class_g = 'Shotwell'\"/" "$PICOM_CONF" ;;
+      26) read -p "darktable opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'darktable'\"/\"$VAL:class_g = 'darktable'\"/" "$PICOM_CONF" ;;
+      27) read -p "Blueman opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Blueman-manager'\"/\"$VAL:class_g = 'Blueman-manager'\"/" "$PICOM_CONF" ;;
+      28) read -p "nvidia-settings opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Nvidia-settings'\"/\"$VAL:class_g = 'Nvidia-settings'\"/" "$PICOM_CONF" ;;
+      29) read -p "flameshot opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'flameshot'\"/\"$VAL:class_g = 'flameshot'\"/" "$PICOM_CONF" ;;
+      30) read -p "wpgtk opacity (0-100): " VAL
+          sed -i "s/\"[0-9]*:class_g = 'Wpgtk'\"/\"$VAL:class_g = 'Wpgtk'\"/" "$PICOM_CONF" ;;
+      n)
+          add_app ;;
+      a)
+          apply_changes
+          read -p "Press enter to continue..." ;;
+      r)
+          read -p "Reset all apps to what opacity? (default 70): " VAL
+          VAL=${VAL:-70}
+          sed -i "s/\"[0-9]*:class_g/\"$VAL:class_g/g" "$PICOM_CONF"
+          echo "✓ All apps reset to $VAL"
+          ;;
+      q)
+          echo "Bye!"
+          exit 0
+          ;;
+      *)
+          echo "Invalid option" ;;
+    esac
+
+    echo ""
+    read -p "Apply now? (y=apply, c=continue editing, q=quit): " CONFIRM
+    case $CONFIRM in
+        y) apply_changes; read -p "Press enter to continue..." ;;
+        q) exit 0 ;;
+        *) continue ;;
+    esac
+done
